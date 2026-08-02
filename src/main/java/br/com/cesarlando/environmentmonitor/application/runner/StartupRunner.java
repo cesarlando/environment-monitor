@@ -4,6 +4,8 @@ import br.com.cesarlando.environmentmonitor.application.usecase.CheckEnvironment
 import br.com.cesarlando.environmentmonitor.domain.enums.EnvironmentType;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class StartupRunner implements CommandLineRunner {
 
     private final CheckEnvironmentUseCase checkEnvironmentUseCase;
+    private static final Logger logger = LoggerFactory.getLogger(StartupRunner.class);
 
     public StartupRunner(CheckEnvironmentUseCase checkEnvironmentUseCase) {
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
@@ -27,7 +30,7 @@ public class StartupRunner implements CommandLineRunner {
 
         CheckResult result = checkEnvironmentUseCase.execute(environment);
 
-        System.out.println("Resultado: " + result);
+        logger.info("Resultado do monitoramento: {}", result);
 
     }
 

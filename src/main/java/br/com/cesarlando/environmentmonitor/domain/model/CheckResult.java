@@ -54,4 +54,14 @@ public class CheckResult {
     public void setDetails(String details) {
         this.details = details;
     }
+    @Override
+    public String toString() {
+        return "CheckResult{" +
+                "environment=" + environment +
+                ", status=" + status +
+                ", checkedAt=" + checkedAt +
+                ", responseTime=" + responseTime +
+                ", details='" + details + '\'' +
+                '}';
+    }
 }

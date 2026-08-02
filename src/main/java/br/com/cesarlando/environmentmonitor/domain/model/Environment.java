@@ -54,4 +54,14 @@ public class Environment {
     public void setStatus(EnvironmentStatus status) {
         this.status = status;
     }
+    @Override
+    public String toString() {
+        return "Environment{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", endpoint='" + endpoint + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

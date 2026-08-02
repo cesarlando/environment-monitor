@@ -14,4 +14,54 @@ public class Environment {
     public Environment () {
 
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public EnvironmentType getType() {
+        return type;
+    }
+
+    public void setType(EnvironmentType type) {
+        this.type = type;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public EnvironmentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EnvironmentStatus status) {
+        this.status = status;
+    }
+    @Override
+    public String toString() {
+        return "Environment{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", endpoint='" + endpoint + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

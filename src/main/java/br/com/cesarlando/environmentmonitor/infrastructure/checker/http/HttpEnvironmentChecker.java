@@ -50,9 +50,14 @@ public class HttpEnvironmentChecker implements EnvironmentChecker {
 
             checkResult.setStatus(EnvironmentStatus.OFFLINE);
             checkResult.setResponseTime(responseTime);
-            checkResult.setDetails(exception.getMessage());
 
-            logger.error("Falha ao verificar {} | Tempo: {} ms | Erro: {}", environment.getName(), responseTime, exception.getMessage());
+            String errorMessage = exception.getMessage();
+            if(errorMessage != null && errorMessage.length() > 300) {
+                errorMessage = errorMessage.substring(0, 300) + "...";
+            }
+            checkResult.setDetails(errorMessage);
+
+            logger.error("Falha ao verificar {} | Tempo: {} ms | Erro: {}", environment.getName(), responseTime, errorMessage);
         }
 
         return checkResult;

@@ -1,7 +1,7 @@
 package br.com.cesarlando.environmentmonitor.application.scheduler;
 
 import br.com.cesarlando.environmentmonitor.application.usecase.CheckEnvironmentUseCase;
-import br.com.cesarlando.environmentmonitor.application.usecase.LoadEnvironmentsUseCase;
+import br.com.cesarlando.environmentmonitor.application.usecase.LoadEnvironmentUseCase;
 import br.com.cesarlando.environmentmonitor.application.usecase.SaveCheckResultUseCase;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
@@ -14,32 +14,49 @@ import java.util.List;
 
 @Component
 public class EnvironmentMonitoringScheduler {
-    private final CheckEnvironmentUseCase checkEnvironmentUseCase;
-    private final LoadEnvironmentsUseCase loadEnvironmentsUseCase;
-    private final SaveCheckResultUseCase saveCheckResultUseCase;
-    private static final Logger logger = LoggerFactory.getLogger(EnvironmentMonitoringScheduler.class);
 
-    public EnvironmentMonitoringScheduler(CheckEnvironmentUseCase checkEnvironmentUseCase, LoadEnvironmentsUseCase loadEnvironmentsUseCase, SaveCheckResultUseCase saveCheckResultUseCase) {
+    private static final Logger logger =
+            LoggerFactory.getLogger(EnvironmentMonitoringScheduler.class);
+
+    private final CheckEnvironmentUseCase checkEnvironmentUseCase;
+    private final LoadEnvironmentUseCase loadEnvironmentUseCase;
+    private final SaveCheckResultUseCase saveCheckResultUseCase;
+
+    public EnvironmentMonitoringScheduler(
+            CheckEnvironmentUseCase checkEnvironmentUseCase,
+            LoadEnvironmentUseCase loadEnvironmentUseCase,
+            SaveCheckResultUseCase saveCheckResultUseCase) {
+
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
-        this.loadEnvironmentsUseCase = loadEnvironmentsUseCase;
+        this.loadEnvironmentUseCase = loadEnvironmentUseCase;
         this.saveCheckResultUseCase = saveCheckResultUseCase;
     }
 
     @Scheduled(fixedDelayString = "${monitor.scheduler.fixed-delay}")
-    public void execute () {
-        logger.info("Executando Ciclo de Monitoramento");
+    public void execute() {
 
-        List<Environment> environments = loadEnvironmentsUseCase.execute();
+        logger.info("Executando ciclo de monitoramento");
 
-        logger.info("Ambientes encontrados para monitoramento: {}", environments.size());
+        List<Environment> environments =
+                loadEnvironmentUseCase.execute();
+
+        logger.info(
+                "Ambientes encontrados para monitoramento: {}",
+                environments.size()
+        );
 
         for (Environment environment : environments) {
 
-            CheckResult result = checkEnvironmentUseCase.execute(environment);
-            CheckResult savedResult = saveCheckResultUseCase.execute(result);
+            CheckResult result =
+                    checkEnvironmentUseCase.execute(environment);
 
-            logger.info("Resultado do ciclo: {}", savedResult);
+            CheckResult savedResult =
+                    saveCheckResultUseCase.execute(result);
+
+            logger.info(
+                    "Resultado do ciclo: {}",
+                    savedResult
+            );
         }
     }
-
 }

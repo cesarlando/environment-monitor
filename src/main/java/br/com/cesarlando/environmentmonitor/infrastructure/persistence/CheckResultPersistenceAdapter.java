@@ -6,6 +6,8 @@ import br.com.cesarlando.environmentmonitor.infrastructure.persistence.mapper.Ch
 import br.com.cesarlando.environmentmonitor.infrastructure.persistence.repository.CheckResultRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class CheckResultPersistenceAdapter implements CheckResultPersistencePort {
 
@@ -21,5 +23,12 @@ public class CheckResultPersistenceAdapter implements CheckResultPersistencePort
     public CheckResult save(CheckResult checkResult) {
 
         return checkResultMapper.toDomain(checkResultRepository.save(checkResultMapper.toEntity(checkResult)));
+    }
+
+    @Override
+    public Optional<CheckResult> findLatestByEnvironmentId(Long environmentId) {
+        return checkResultRepository
+                .findTopByEnvironmentIdOrderByCheckedAtDesc(environmentId)
+                .map(checkResultMapper::toDomain);
     }
 }

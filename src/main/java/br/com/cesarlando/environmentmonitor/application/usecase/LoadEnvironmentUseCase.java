@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class LoadEnvironmentsUseCase {
+public class LoadEnvironmentUseCase {
+
     private final EnvironmentPersistencePort environmentPersistencePort;
 
-    public LoadEnvironmentsUseCase(EnvironmentPersistencePort environmentPersistencePort) {
+    public LoadEnvironmentUseCase(
+            EnvironmentPersistencePort environmentPersistencePort) {
         this.environmentPersistencePort = environmentPersistencePort;
     }
 

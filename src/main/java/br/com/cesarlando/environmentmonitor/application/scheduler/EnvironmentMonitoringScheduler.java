@@ -2,6 +2,7 @@ package br.com.cesarlando.environmentmonitor.application.scheduler;
 
 import br.com.cesarlando.environmentmonitor.application.usecase.CheckEnvironmentUseCase;
 import br.com.cesarlando.environmentmonitor.application.usecase.LoadEnvironmentsUseCase;
+import br.com.cesarlando.environmentmonitor.application.usecase.SaveCheckResultUseCase;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
 import org.slf4j.Logger;
@@ -15,11 +16,13 @@ import java.util.List;
 public class EnvironmentMonitoringScheduler {
     private final CheckEnvironmentUseCase checkEnvironmentUseCase;
     private final LoadEnvironmentsUseCase loadEnvironmentsUseCase;
+    private final SaveCheckResultUseCase saveCheckResultUseCase;
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentMonitoringScheduler.class);
 
-    public EnvironmentMonitoringScheduler(CheckEnvironmentUseCase checkEnvironmentUseCase, LoadEnvironmentsUseCase loadEnvironmentsUseCase) {
+    public EnvironmentMonitoringScheduler(CheckEnvironmentUseCase checkEnvironmentUseCase, LoadEnvironmentsUseCase loadEnvironmentsUseCase, SaveCheckResultUseCase saveCheckResultUseCase) {
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
         this.loadEnvironmentsUseCase = loadEnvironmentsUseCase;
+        this.saveCheckResultUseCase = saveCheckResultUseCase;
     }
 
     @Scheduled(fixedDelayString = "${monitor.scheduler.fixed-delay}")
@@ -31,9 +34,11 @@ public class EnvironmentMonitoringScheduler {
         logger.info("Ambientes encontrados para monitoramento: {}", environments.size());
 
         for (Environment environment : environments) {
-            CheckResult result = checkEnvironmentUseCase.execute(environment);
 
-            logger.info("Resultado do ciclo: {}", result);
+            CheckResult result = checkEnvironmentUseCase.execute(environment);
+            CheckResult savedResult = saveCheckResultUseCase.execute(result);
+
+            logger.info("Resultado do ciclo: {}", savedResult);
         }
     }
 

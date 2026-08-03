@@ -26,7 +26,6 @@ public class EnvironmentEntity {
     private EnvironmentStatus status;
 
     public EnvironmentEntity () {
-
     }
 
     public Long getId() {

@@ -32,7 +32,11 @@ public class EnvironmentMonitoringScheduler {
         this.saveCheckResultUseCase = saveCheckResultUseCase;
     }
 
-    @Scheduled(fixedDelayString = "${monitor.scheduler.fixed-delay}")
+    @Scheduled(
+            fixedDelayString = "${monitor.scheduler.fixed-delay}",
+            initialDelayString = "${monitor.scheduler.initial-delay}"
+        )
+
     public void execute() {
 
         logger.info("Executando ciclo de monitoramento");

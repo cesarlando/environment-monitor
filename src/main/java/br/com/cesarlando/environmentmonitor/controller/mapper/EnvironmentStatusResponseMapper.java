@@ -15,7 +15,7 @@ public class EnvironmentStatusResponseMapper {
         response.setName(checkResult.getEnvironment().getName());
         response.setType(checkResult.getEnvironment().getType().name());
         response.setEndpoint(checkResult.getEnvironment().getEndpoint());
-        response.setStatus(checkResult.getEnvironment().getStatus().name());
+        response.setStatus(checkResult.getStatus().name());
         response.setResponseTime(checkResult.getResponseTime());
         response.setCheckedAt(checkResult.getCheckedAt());
         response.setDetails(checkResult.getDetails());

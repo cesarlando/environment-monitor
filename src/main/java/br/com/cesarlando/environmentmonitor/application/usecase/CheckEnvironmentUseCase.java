@@ -15,7 +15,7 @@ public class CheckEnvironmentUseCase {
     }
 
     public CheckResult execute (Environment environment) {
-        EnvironmentChecker checker = environmentCheckerFactory.getChecker();
+        EnvironmentChecker checker = environmentCheckerFactory.getChecker(environment);
 
         return checker.check(environment);
     }

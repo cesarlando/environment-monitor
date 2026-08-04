@@ -1,18 +1,31 @@
-package br.com.cesarlando.environmentmonitor.domain.model;
+package br.com.cesarlando.environmentmonitor.infrastructure.persistence.entity;
 
 import br.com.cesarlando.environmentmonitor.domain.enums.EnvironmentStatus;
 import br.com.cesarlando.environmentmonitor.domain.enums.EnvironmentType;
+import jakarta.persistence.*;
 
-public class Environment {
-
+@Entity
+@Table(name = "environments")
+public class EnvironmentEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EnvironmentType type;
+
+    @Column(nullable = false, length = 500)
     private String endpoint;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EnvironmentStatus status;
 
-    public Environment () {
-
+    public EnvironmentEntity () {
     }
 
     public Long getId() {
@@ -53,15 +66,5 @@ public class Environment {
 
     public void setStatus(EnvironmentStatus status) {
         this.status = status;
-    }
-    @Override
-    public String toString() {
-        return "Environment{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                ", endpoint='" + endpoint + '\'' +
-                ", status=" + status +
-                '}';
     }
 }

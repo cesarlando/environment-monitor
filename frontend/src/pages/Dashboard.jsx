@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getEnvironments } from "../services/environmentService";
 import Grid from "@mui/material/Grid";
 import EnvironmentCard from "../components/EnvironmentCard";
+import SummaryCard from "../components/SummaryCard";
 
 import {
     Box,
@@ -29,6 +30,20 @@ export default function Dashboard() {
 
   }, []);
 
+  const online = environments.filter(
+      environment => environment.status === "ONLINE"
+  ).length;
+
+  const offline = environments.filter(
+      environment => environment.status === "OFFLINE"
+  ).length;
+
+  const warning = environments.filter(
+      environment => environment.status === "WARNING"
+  ).length;
+
+  const total = environments.length;
+
     return (
         <Container maxWidth="lg">
             <Box sx={{ mt: 4 }}>
@@ -48,6 +63,42 @@ export default function Dashboard() {
                 >
                     Monitoring your environments in real time
                 </Typography>
+
+                <Grid container spacing={3} sx={{ mb: 4, mt: 1 }}>
+
+                    <Grid size={{ xs: 6, md: 3 }}>
+                        <SummaryCard
+                            title="Online"
+                            value={online}
+                            color="success.main"
+                        />
+                    </Grid>
+
+                    <Grid size={{ xs: 6, md: 3 }}>
+                        <SummaryCard
+                            title="Offline"
+                            value={offline}
+                            color="error.main"
+                        />
+                    </Grid>
+
+                    <Grid size={{ xs: 6, md: 3 }}>
+                        <SummaryCard
+                            title="Warning"
+                            value={warning}
+                            color="warning.main"
+                        />
+                    </Grid>
+
+                    <Grid size={{ xs: 6, md: 3 }}>
+                        <SummaryCard
+                            title="Total"
+                            value={total}
+                            color="primary.main"
+                        />
+                    </Grid>
+
+                </Grid>
 
                 <Grid container spacing={3}>
                     {environments.map((environment) => (

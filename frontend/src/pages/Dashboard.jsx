@@ -1,48 +1,89 @@
 import { useEffect, useState } from "react";
-import { getEnvironments } from "../services/environmentService";
 import Grid from "@mui/material/Grid";
-import EnvironmentCard from "../components/EnvironmentCard";
-import SummaryCard from "../components/SummaryCard";
 
 import {
     Box,
+    Button,
     Container,
+    TextField,
     Typography
 } from "@mui/material";
+
+import { getEnvironments } from "../services/environmentService";
+import EnvironmentCard from "../components/EnvironmentCard";
+import SummaryCard from "../components/SummaryCard";
 
 export default function Dashboard() {
 
     const [environments, setEnvironments] = useState([]);
+    const [selectedType, setSelectedType] = useState("ALL");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [lastUpdate, setLastUpdate] = useState(null);
 
-  useEffect(() => {
+    useEffect(() => {
 
-      const load = () => {
-          getEnvironments()
-              .then(setEnvironments)
-              .catch(console.error);
-      };
+        const loadEnvironments = () => {
+            getEnvironments()
+                .then((environments) => {
+                setEnvironments(environments);
+                setLastUpdate(new Date());
+                })
+                .catch(console.error);
+        };
 
-      load();
+        loadEnvironments();
 
-      const interval = setInterval(load, 30000);
+        const interval = setInterval(loadEnvironments, 30000);
 
-      return () => clearInterval(interval);
+        return () => clearInterval(interval);
 
-  }, []);
+    }, []);
 
-  const online = environments.filter(
-      environment => environment.status === "ONLINE"
-  ).length;
+    const environmentTypes = [
+        "ALL",
+        ...new Set(
+            environments.map(environment => environment.type)
+        )
+    ];
 
-  const offline = environments.filter(
-      environment => environment.status === "OFFLINE"
-  ).length;
+    const filteredEnvironments = environments.filter((environment) => {
 
-  const warning = environments.filter(
-      environment => environment.status === "WARNING"
-  ).length;
+        const matchesType =
+            selectedType === "ALL" ||
+            environment.type === selectedType;
 
-  const total = environments.length;
+        const normalizedSearch = searchTerm
+            .trim()
+            .toLowerCase();
+
+        const matchesSearch =
+            normalizedSearch === "" ||
+            environment.name
+                .toLowerCase()
+                .includes(normalizedSearch) ||
+            environment.endpoint
+                .toLowerCase()
+                .includes(normalizedSearch) ||
+            environment.type
+                .toLowerCase()
+                .includes(normalizedSearch);
+
+        return matchesType && matchesSearch;
+    });
+
+    const online = environments.filter(
+        environment => environment.status === "ONLINE"
+    ).length;
+
+    const offline = environments.filter(
+        environment => environment.status === "OFFLINE"
+    ).length;
+
+    const warning = environments.filter(
+        environment => environment.status === "WARNING"
+    ).length;
+
+    const total = environments.length;
 
     return (
         <Container maxWidth="lg">
@@ -64,7 +105,22 @@ export default function Dashboard() {
                     Monitoring your environments in real time
                 </Typography>
 
-                <Grid container spacing={3} sx={{ mb: 4, mt: 1 }}>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb : 4 }}
+
+                    >
+
+                    Dashboard atualizado em: {" "}
+                    {lastUpdate
+                        ? lastUpdate.toLocaleString("pt-BR")
+                        : "Aguardando atualização..."}
+
+                </Typography>
+
+                {/* Resumo */}
+                <Grid container spacing={3} sx={{ mb: 4 }}>
 
                     <Grid size={{ xs: 6, md: 3 }}>
                         <SummaryCard
@@ -100,8 +156,43 @@ export default function Dashboard() {
 
                 </Grid>
 
+                {/* Filtros */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: 2,
+                        mb: 4,
+                        flexWrap: "wrap"
+                    }}
+                >
+                    {environmentTypes.map((filter) => (
+                        <Button
+                            key={filter}
+                            variant={
+                                selectedType === filter
+                                    ? "contained"
+                                    : "outlined"
+                            }
+                            onClick={() => setSelectedType(filter)}
+                        >
+                            {filter}
+                        </Button>
+                    ))}
+                </Box>
+
+                <TextField
+                    fullWidth
+                    label="Pesquisar ambiente"
+                    placeholder="Digite o nome, endpoint ou tipo"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    sx={{ mb: 4 }}
+                />
+
+                {/* Ambientes */}
                 <Grid container spacing={3}>
-                    {environments.map((environment) => (
+
+                    {filteredEnvironments.map((environment) => (
                         <Grid
                             key={environment.id}
                             size={{ xs: 12, md: 6, lg: 4 }}
@@ -109,6 +200,7 @@ export default function Dashboard() {
                             <EnvironmentCard environment={environment} />
                         </Grid>
                     ))}
+
                 </Grid>
 
             </Box>

@@ -37,6 +37,18 @@ function getEnvironmentIcon(type) {
 
 }
 
+        function getEnvironmentDescription(environment) {
+
+            switch (environment.type) {
+            case "DATABASE":
+                return "Oracle";
+            case "MIDDLEWARE":
+                return "WAMiddleware";
+            default:
+                return environment.endpoint;
+            }
+        }
+
 function getStatusColor(status) {
 
     switch (status) {
@@ -75,14 +87,6 @@ export default function EnvironmentCard({ environment }) {
         ? new Date(environment.checkedAt).toLocaleString("pt-BR")
         : "Ainda não verificado";
 
-        function getEnvironmentEndpoint(environment) {
-
-            if (environment.type === "DATABASE") {
-                return "Oracle";
-            }
-
-            return environment.endpoint;
-        }
 
     return (
         <Card
@@ -124,7 +128,7 @@ export default function EnvironmentCard({ environment }) {
                         wordBreak: "break-word"
                     }}
                 >
-                    {getEnvironmentEndpoint(environment)}
+                    {getEnvironmentDescription(environment)}
                 </Typography>
 
                 <Chip

@@ -21,9 +21,8 @@ public class EnvironmentCheckerFactory {
         EnvironmentType type = environment.getType();
 
         return  switch (type) {
-            case WEB, COLLECTOR -> httpEnvironmentChecker;
+            case WEB, COLLECTOR, MIDDLEWARE -> httpEnvironmentChecker;
             case DATABASE -> databaseEnvironmentChecker;
-            case MIDDLEWARE -> throw new IllegalArgumentException("Middleware checker not implemented yet");
         };
     }
 }

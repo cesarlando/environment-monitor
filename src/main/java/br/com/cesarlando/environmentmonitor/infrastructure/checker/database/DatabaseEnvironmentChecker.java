@@ -31,10 +31,6 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
     public CheckResult check(Environment environment) {
         logger.info("Executando checker DATABASE para {}", environment.getName());
 
-        logger.info("===== DATABASE CHECKER =====");
-        logger.info("Banco: {}", environment.getName());
-        logger.info("Endpoint: {}", environment.getEndpoint());
-
         long startTime = System.currentTimeMillis();
 
         CheckResult checkResult = new CheckResult();
@@ -86,7 +82,7 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
             checkResult.setStatus(EnvironmentStatus.ONLINE);
             checkResult.setResponseTime(responseTime);
             checkResult.setDetails(
-                    "Oracle connection successful"
+                    "Conexão realizada com sucesso"
             );
 
             logger.info(

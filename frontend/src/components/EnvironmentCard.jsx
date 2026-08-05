@@ -37,6 +37,18 @@ function getEnvironmentIcon(type) {
 
 }
 
+        function getEnvironmentDescription(environment) {
+
+            switch (environment.type) {
+            case "DATABASE":
+                return "Oracle";
+            case "MIDDLEWARE":
+                return "WAMiddleware";
+            default:
+                return environment.endpoint;
+            }
+        }
+
 function getStatusColor(status) {
 
     switch (status) {
@@ -75,6 +87,7 @@ export default function EnvironmentCard({ environment }) {
         ? new Date(environment.checkedAt).toLocaleString("pt-BR")
         : "Ainda não verificado";
 
+
     return (
         <Card
             sx={{
@@ -103,9 +116,7 @@ export default function EnvironmentCard({ environment }) {
                             {environment.name}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
-                            {environment.type}
-                        </Typography>
+
                     </Box>
                 </Box>
 
@@ -117,7 +128,7 @@ export default function EnvironmentCard({ environment }) {
                         wordBreak: "break-word"
                     }}
                 >
-                    {environment.endpoint}
+                    {getEnvironmentDescription(environment)}
                 </Typography>
 
                 <Chip

@@ -94,7 +94,7 @@ export default function Dashboard() {
                     fontWeight="bold"
                     gutterBottom
                 >
-                    Environment Monitor
+                    Monitor de Ambientes
                 </Typography>
 
                 <Typography
@@ -102,7 +102,7 @@ export default function Dashboard() {
                     color="text.secondary"
                     sx={{ mb: 4 }}
                 >
-                    Monitoring your environments in real time
+                    Monitoramento de ambientes em tempo real
                 </Typography>
 
                 <Typography

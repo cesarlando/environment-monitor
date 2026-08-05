@@ -75,6 +75,15 @@ export default function EnvironmentCard({ environment }) {
         ? new Date(environment.checkedAt).toLocaleString("pt-BR")
         : "Ainda não verificado";
 
+        function getEnvironmentEndpoint(environment) {
+
+            if (environment.type === "DATABASE") {
+                return "Oracle";
+            }
+
+            return environment.endpoint;
+        }
+
     return (
         <Card
             sx={{
@@ -103,9 +112,7 @@ export default function EnvironmentCard({ environment }) {
                             {environment.name}
                         </Typography>
 
-                        <Typography variant="body2" color="text.secondary">
-                            {environment.type}
-                        </Typography>
+
                     </Box>
                 </Box>
 
@@ -117,7 +124,7 @@ export default function EnvironmentCard({ environment }) {
                         wordBreak: "break-word"
                     }}
                 >
-                    {environment.endpoint}
+                    {getEnvironmentEndpoint(environment)}
                 </Typography>
 
                 <Chip

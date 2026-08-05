@@ -41,9 +41,13 @@ function getEnvironmentIcon(type) {
 
             switch (environment.type) {
             case "DATABASE":
-                return "Oracle";
+                return environment.databaseType === "SQL_SERVER"
+                ? "SQL Server"
+                : "Oracle";
+
             case "MIDDLEWARE":
                 return "WAMiddleware";
+
             default:
                 return environment.endpoint;
             }

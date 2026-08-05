@@ -64,6 +64,12 @@
 			<artifactId>ojdbc11</artifactId>
 			<version>23.26.2.0.0</version>
 		</dependency>
+		<!-- Microsoft SQL Server JDBC driver -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>13.4.0.jre11</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

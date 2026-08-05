@@ -62,9 +62,7 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
                     );
 
                     PreparedStatement statement =
-                            connection.prepareStatement(
-                                    "SELECT 1 FROM DUAL"
-                            );
+                            connection.prepareStatement(getValidationQuery(config));
 
                     ResultSet resultSet = statement.executeQuery()
             ) {
@@ -81,9 +79,7 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
 
             checkResult.setStatus(EnvironmentStatus.ONLINE);
             checkResult.setResponseTime(responseTime);
-            checkResult.setDetails(
-                    "Conexão realizada com sucesso"
-            );
+            checkResult.setDetails(getSuccessMessage(config));
 
             logger.info(
                     "Banco {} ONLINE | Tempo: {} ms",
@@ -131,21 +127,33 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
 
     private String buildJdbcUrl(DatabaseConfigProperties config) {
 
-        if (!"ORACLE".equalsIgnoreCase(
-                config.getDatabaseType())) {
+        String databaseType = config.getDatabaseType();
 
-            throw new IllegalArgumentException(
-                    "Unsupported database type: "
-                            + config.getDatabaseType()
-            );
+        if ("ORACLE".equalsIgnoreCase(databaseType)) {
+
+            return "jdbc:oracle:thin:@//"
+                    + config.getHost()
+                    + ":"
+                    + config.getPort()
+                    + "/"
+                    + config.getServiceName();
         }
 
-        return "jdbc:oracle:thin:@//"
-                + config.getHost()
-                + ":"
-                + config.getPort()
-                + "/"
-                + config.getServiceName();
+        if ("SQL_SERVER".equalsIgnoreCase(databaseType)) {
+
+            return "jdbc:sqlserver://"
+                    + config.getHost()
+                    + ":"
+                    + config.getPort()
+                    + ";databaseName="
+                    + config.getDatabase()
+                    + ";encrypt=true"
+                    + ";trustServerCertificate=true";
+        }
+
+        throw new IllegalArgumentException(
+                "Unsupported database type: " + databaseType
+        );
     }
 
     private String limitErrorMessage(String errorMessage) {
@@ -159,6 +167,36 @@ public class DatabaseEnvironmentChecker implements EnvironmentChecker {
         }
 
         return errorMessage;
+    }
+
+    private String getValidationQuery(DatabaseConfigProperties config) {
+
+        String databaseType = config.getDatabaseType();
+
+        if ("ORACLE".equalsIgnoreCase(databaseType)) {
+            return "SELECT 1 FROM DUAL";
+        }
+
+        if ("SQL_SERVER".equalsIgnoreCase(databaseType)) {
+            return "SELECT 1";
+        }
+
+        throw new IllegalArgumentException(
+                "Unsupported database type: " + databaseType
+        );
+    }
+
+    private String getSuccessMessage(DatabaseConfigProperties config) {
+
+        return switch (config.getDatabaseType()) {
+            case "ORACLE" ->
+                "Conexão Oracle realizada com sucesso";
+
+            case "SQL_SERVER" ->
+                "Conexão SQL Server realizada com sucesso";
+
+            default -> "Conexão com banco realizada com sucesso";
+        };
     }
 }
 

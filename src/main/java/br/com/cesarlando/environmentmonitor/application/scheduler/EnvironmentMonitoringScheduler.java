@@ -2,6 +2,7 @@ package br.com.cesarlando.environmentmonitor.application.scheduler;
 
 import br.com.cesarlando.environmentmonitor.application.usecase.CheckEnvironmentUseCase;
 import br.com.cesarlando.environmentmonitor.application.usecase.LoadEnvironmentUseCase;
+import br.com.cesarlando.environmentmonitor.application.usecase.SaveCheckHistoryUseCase;
 import br.com.cesarlando.environmentmonitor.application.usecase.SaveCheckResultUseCase;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
@@ -22,14 +23,13 @@ public class EnvironmentMonitoringScheduler {
     private final LoadEnvironmentUseCase loadEnvironmentUseCase;
     private final SaveCheckResultUseCase saveCheckResultUseCase;
 
-    public EnvironmentMonitoringScheduler(
-            CheckEnvironmentUseCase checkEnvironmentUseCase,
-            LoadEnvironmentUseCase loadEnvironmentUseCase,
-            SaveCheckResultUseCase saveCheckResultUseCase) {
+    private final SaveCheckHistoryUseCase saveCheckHistoryUseCase;
 
+    public EnvironmentMonitoringScheduler(CheckEnvironmentUseCase checkEnvironmentUseCase, LoadEnvironmentUseCase loadEnvironmentUseCase, SaveCheckResultUseCase saveCheckResultUseCase, SaveCheckHistoryUseCase saveCheckHistoryUseCase) {
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
         this.loadEnvironmentUseCase = loadEnvironmentUseCase;
         this.saveCheckResultUseCase = saveCheckResultUseCase;
+        this.saveCheckHistoryUseCase = saveCheckHistoryUseCase;
     }
 
     @Scheduled(
@@ -51,16 +51,21 @@ public class EnvironmentMonitoringScheduler {
 
         for (Environment environment : environments) {
 
-            CheckResult result =
-                    checkEnvironmentUseCase.execute(environment);
+            try {
+                CheckResult result =
+                        checkEnvironmentUseCase.execute(environment);
 
-            CheckResult savedResult =
-                    saveCheckResultUseCase.execute(result);
+                CheckResult savedResult =
+                        saveCheckResultUseCase.execute(result);
+                saveCheckHistoryUseCase.execute(savedResult);
 
-            logger.info(
-                    "Resultado do ciclo: {}",
-                    savedResult
-            );
+                logger.info(
+                        "Resultado do ciclo: {}",
+                        savedResult
+                );
+            } catch(Exception exception) {
+                logger.error("Falha ao processar o ambiente {}: {}", environment.getName(), exception.getMessage(), exception);
+            }
         }
     }
 }

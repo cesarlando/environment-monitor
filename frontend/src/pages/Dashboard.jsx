@@ -12,6 +12,7 @@ import {
 import { getEnvironments } from "../services/environmentService";
 import EnvironmentCard from "../components/EnvironmentCard";
 import SummaryCard from "../components/SummaryCard";
+import EnvironmentHistoryDialog from "../components/EnvironmentHistoryDialog";
 
 export default function Dashboard() {
 
@@ -19,6 +20,8 @@ export default function Dashboard() {
     const [selectedType, setSelectedType] = useState("ALL");
     const [searchTerm, setSearchTerm] = useState("");
     const [lastUpdate, setLastUpdate] = useState(null);
+    const [selectedEnvironment, setSelectedEnvironment] = useState(null);
+    const [historyOpen, setHistoryOpen] = useState(false);
 
     useEffect(() => {
 
@@ -38,6 +41,16 @@ export default function Dashboard() {
         return () => clearInterval(interval);
 
     }, []);
+
+    const handleOpenHistory = (environment) => {
+        setSelectedEnvironment(environment);
+        setHistoryOpen(true);
+    };
+
+    const handleCloseHistory = () => {
+        setHistoryOpen(false);
+        setSelectedEnvironment(null);
+    };
 
     const environmentTypes = [
         "ALL",
@@ -197,13 +210,21 @@ export default function Dashboard() {
                             key={environment.id}
                             size={{ xs: 12, md: 6, lg: 4 }}
                         >
-                            <EnvironmentCard environment={environment} />
+                            <EnvironmentCard
+                            environment={environment}
+                            onOpenHistory={handleOpenHistory}
+                             />
                         </Grid>
                     ))}
 
                 </Grid>
 
             </Box>
+            <EnvironmentHistoryDialog
+                open={historyOpen}
+                environment={selectedEnvironment}
+                onClose={handleCloseHistory}
+            />
         </Container>
     );
 }

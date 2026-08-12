@@ -2,16 +2,17 @@ package br.com.cesarlando.environmentmonitor.application.usecase;
 
 import br.com.cesarlando.environmentmonitor.domain.model.CheckHistory;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
+import br.com.cesarlando.environmentmonitor.domain.ports.CheckHistoryPersistencePort;
 import br.com.cesarlando.environmentmonitor.infrastructure.persistence.CheckHistoryPersistenceAdapter;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SaveCheckHistoryUseCase {
 
-    private final CheckHistoryPersistenceAdapter checkHistoryPersistenceAdapter;
+    private final CheckHistoryPersistencePort checkHistoryPersistencePort;
 
-    public SaveCheckHistoryUseCase(CheckHistoryPersistenceAdapter checkHistoryPersistenceAdapter) {
-        this.checkHistoryPersistenceAdapter = checkHistoryPersistenceAdapter;
+    public SaveCheckHistoryUseCase(CheckHistoryPersistencePort checkHistoryPersistencePort) {
+        this.checkHistoryPersistencePort = checkHistoryPersistencePort;
     }
 
     public CheckHistory execute(CheckResult checkResult) {
@@ -26,6 +27,6 @@ public class SaveCheckHistoryUseCase {
         history.setDetails(checkResult.getDetails());
         history.setCheckedAt(checkResult.getCheckedAt());
 
-        return checkHistoryPersistenceAdapter.save(history);
+        return checkHistoryPersistencePort.save(history);
     }
 }

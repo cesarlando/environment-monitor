@@ -62,13 +62,6 @@ public class TeamsNotificationAdapter implements NotificationPort {
                     currentStatus
             );
 
-//        restClient
-//                .post()
-//                .uri(properties.getWebhookUrl())
-//                .body(payload)
-//                .retrieve()
-//                .toBodilessEntity();
-
             String webhookUrl = properties.getWebhookUrl().trim();
 
             String json = new ObjectMapper()

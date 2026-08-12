@@ -85,7 +85,7 @@ function getStatusIcon(status) {
 
 }
 
-export default function EnvironmentCard({ environment }) {
+export default function EnvironmentCard({ environment, onOpenHistory }) {
 
     const checkedAt = environment.checkedAt
         ? new Date(environment.checkedAt).toLocaleString("pt-BR")
@@ -94,6 +94,7 @@ export default function EnvironmentCard({ environment }) {
 
     return (
         <Card
+            onClick={() => onOpenHistory(environment)}
             sx={{
                 height: "100%",
                 borderRadius: 3,

@@ -5,6 +5,7 @@ import br.com.cesarlando.environmentmonitor.domain.ports.CheckHistoryPersistence
 import br.com.cesarlando.environmentmonitor.dto.EnvironmentHistorySummaryResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -28,14 +29,24 @@ public class LoadEnvironmentHistorySummaryUseCase {
             response.setTotalChecks(0);
             response.setOffLineCount(0);
             response.setAverageResponseTime(0.0);
+            response.setLastOfflineAt(null);
 
             return response;
         }
         response.setEnvironmentName(history.getFirst().getEnvironmentName());
         response.setTotalChecks(history.size());
+
         long offLineCount = history.stream().filter(item -> "OFFLINE".equals(item.getStatus()))
                 .count();
         response.setOffLineCount(offLineCount);
+
+        LocalDateTime lastOfflineAt =
+                history.stream()
+                        .filter(item -> "OFFLINE".equals(item.getStatus()))
+                        .map(CheckHistory::getCheckedAt)
+                        .findFirst()
+                        .orElse(null);
+        response.setLastOfflineAt(lastOfflineAt);
 
         double averageResponseTime = history.stream()
                 .filter(item -> item.getResponseTime() != null)

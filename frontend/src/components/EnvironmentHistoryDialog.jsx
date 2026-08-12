@@ -15,6 +15,7 @@ import {
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import SpeedIcon from "@mui/icons-material/Speed";
+import HistoryIcon from "@mui/icons-material/History";
 
 import { useEffect, useState } from "react";
 
@@ -202,6 +203,27 @@ export default function EnvironmentHistoryDialog({
                            </CardContent>
                        </Card>
 
+                   </Box>
+               )}
+
+               {summary?.lastOfflineAt && (
+                   <Box
+                       sx={{
+                           display: "flex",
+                           alignItems: "center",
+                           gap: 1,
+                           mb: 3
+                       }}
+                   >
+                       <HistoryIcon color="error" />
+
+                       <Typography variant="body2">
+                           Última indisponibilidade:{" "}
+                           <strong>
+                               {new Date(summary.lastOfflineAt)
+                                   .toLocaleString("pt-BR")}
+                           </strong>
+                       </Typography>
                    </Box>
                )}
 

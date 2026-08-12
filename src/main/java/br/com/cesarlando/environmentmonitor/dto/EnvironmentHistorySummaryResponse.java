@@ -1,5 +1,7 @@
 package br.com.cesarlando.environmentmonitor.dto;
 
+import java.time.LocalDateTime;
+
 public class EnvironmentHistorySummaryResponse {
 
     private Long environmentId;
@@ -7,6 +9,8 @@ public class EnvironmentHistorySummaryResponse {
     private long totalChecks;
     private long offLineCount;
     private Double averageResponseTime;
+
+    private LocalDateTime lastOfflineAt;
 
     public EnvironmentHistorySummaryResponse() {
     }
@@ -49,5 +53,13 @@ public class EnvironmentHistorySummaryResponse {
 
     public void setAverageResponseTime(Double averageResponseTime) {
         this.averageResponseTime = averageResponseTime;
+    }
+
+    public LocalDateTime getLastOfflineAt() {
+        return lastOfflineAt;
+    }
+
+    public void setLastOfflineAt(LocalDateTime lastOfflineAt) {
+        this.lastOfflineAt = lastOfflineAt;
     }
 }

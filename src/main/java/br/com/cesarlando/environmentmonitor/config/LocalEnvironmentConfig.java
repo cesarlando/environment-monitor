@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 @EnableConfigurationProperties({
         LocalEnvironmentProperties.class,
         DatabaseEnvironmentProperties.class,
-        TeamsNotificationProperties.class
+        TeamsNotificationProperties.class,
 })
 public class LocalEnvironmentConfig {
 }

@@ -1,8 +1,6 @@
 package br.com.cesarlando.environmentmonitor.application.scheduler;
 
-import br.com.cesarlando.environmentmonitor.application.usecase.CheckEnvironmentUseCase;
-import br.com.cesarlando.environmentmonitor.application.usecase.LoadEnvironmentUseCase;
-import br.com.cesarlando.environmentmonitor.application.usecase.SaveCheckResultUseCase;
+import br.com.cesarlando.environmentmonitor.application.usecase.*;
 import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
 import org.slf4j.Logger;
@@ -21,21 +19,21 @@ public class EnvironmentMonitoringScheduler {
     private final CheckEnvironmentUseCase checkEnvironmentUseCase;
     private final LoadEnvironmentUseCase loadEnvironmentUseCase;
     private final SaveCheckResultUseCase saveCheckResultUseCase;
+    private final SaveCheckHistoryUseCase saveCheckHistoryUseCase;
+    private final AlertEnvironmentStatusUseCase alertEnvironmentStatusUseCase;
 
-    public EnvironmentMonitoringScheduler(
-            CheckEnvironmentUseCase checkEnvironmentUseCase,
-            LoadEnvironmentUseCase loadEnvironmentUseCase,
-            SaveCheckResultUseCase saveCheckResultUseCase) {
-
+    public EnvironmentMonitoringScheduler(CheckEnvironmentUseCase checkEnvironmentUseCase, LoadEnvironmentUseCase loadEnvironmentUseCase, SaveCheckResultUseCase saveCheckResultUseCase, SaveCheckHistoryUseCase saveCheckHistoryUseCase, AlertEnvironmentStatusUseCase alertEnvironmentStatusUseCase) {
         this.checkEnvironmentUseCase = checkEnvironmentUseCase;
         this.loadEnvironmentUseCase = loadEnvironmentUseCase;
         this.saveCheckResultUseCase = saveCheckResultUseCase;
+        this.saveCheckHistoryUseCase = saveCheckHistoryUseCase;
+        this.alertEnvironmentStatusUseCase = alertEnvironmentStatusUseCase;
     }
 
     @Scheduled(
             fixedDelayString = "${monitor.scheduler.fixed-delay}",
             initialDelayString = "${monitor.scheduler.initial-delay}"
-        )
+    )
 
     public void execute() {
 
@@ -51,16 +49,31 @@ public class EnvironmentMonitoringScheduler {
 
         for (Environment environment : environments) {
 
-            CheckResult result =
-                    checkEnvironmentUseCase.execute(environment);
+            try {
+                CheckResult result = checkEnvironmentUseCase.execute(environment);
 
-            CheckResult savedResult =
-                    saveCheckResultUseCase.execute(result);
+                try {
+                    alertEnvironmentStatusUseCase.execute(result);
+                } catch (Exception exception) {
+                    logger.error(
+                            "Falha ao enviar alerta do ambiente {}: {}",
+                            environment.getName(),
+                            exception.getMessage(),
+                            exception
+                    );
+                }
 
-            logger.info(
-                    "Resultado do ciclo: {}",
-                    savedResult
-            );
+                CheckResult savedResult = saveCheckResultUseCase.execute(result);
+
+                saveCheckHistoryUseCase.execute(savedResult);
+
+                logger.info(
+                        "Resultado do ciclo: {}",
+                        savedResult
+                );
+            } catch (Exception exception) {
+                logger.error("Falha ao processar o ambiente {}: {}", environment.getName(), exception.getMessage(), exception);
+            }
         }
     }
 }

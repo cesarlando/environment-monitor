@@ -28,4 +28,22 @@ public class HttpClientConfig {
                 .build();
     }
 
+    @Bean("collectorRestClient")
+    public RestClient collectorRestClient() {
+
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .build();
+
+        JdkClientHttpRequestFactory requestFactory =
+                new JdkClientHttpRequestFactory(httpClient);
+
+        requestFactory.setReadTimeout(Duration.ofSeconds(20));
+
+        return RestClient.builder()
+                .requestFactory(requestFactory)
+                .build();
+    }
+
 }

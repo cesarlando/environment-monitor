@@ -8,6 +8,7 @@ public class EnvironmentStatusResponse {
     private String name;
     private String type;
     private String endpoint;
+    private String databaseType;
     private String status;
     private Long responseTime;
     private LocalDateTime checkedAt;
@@ -46,6 +47,14 @@ public class EnvironmentStatusResponse {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public String getDatabaseType() {
+        return databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
     }
 
     public String getStatus() {

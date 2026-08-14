@@ -41,9 +41,13 @@ function getEnvironmentIcon(type) {
 
             switch (environment.type) {
             case "DATABASE":
-                return "Oracle";
+                return environment.databaseType === "SQL_SERVER"
+                ? "SQL Server"
+                : "Oracle";
+
             case "MIDDLEWARE":
                 return "WAMiddleware";
+
             default:
                 return environment.endpoint;
             }
@@ -81,7 +85,7 @@ function getStatusIcon(status) {
 
 }
 
-export default function EnvironmentCard({ environment }) {
+export default function EnvironmentCard({ environment, onOpenHistory }) {
 
     const checkedAt = environment.checkedAt
         ? new Date(environment.checkedAt).toLocaleString("pt-BR")
@@ -90,6 +94,7 @@ export default function EnvironmentCard({ environment }) {
 
     return (
         <Card
+            onClick={() => onOpenHistory(environment)}
             sx={{
                 height: "100%",
                 borderRadius: 3,

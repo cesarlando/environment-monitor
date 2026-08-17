@@ -68,9 +68,13 @@ public class EnvironmentMonitoringScheduler {
                 saveCheckHistoryUseCase.execute(savedResult);
 
                 logger.info(
-                        "Resultado do ciclo: {}",
-                        savedResult
+                        "Resultado do monitoramento | Ambiente: {} | Status: {} | Tempo: {} ms | Detalhes: {}",
+                        savedResult.getEnvironment().getName(),
+                        savedResult.getStatus(),
+                        savedResult.getResponseTime(),
+                        savedResult.getDetails()
                 );
+
             } catch (Exception exception) {
                 logger.error("Falha ao processar o ambiente {}: {}", environment.getName(), exception.getMessage(), exception);
             }

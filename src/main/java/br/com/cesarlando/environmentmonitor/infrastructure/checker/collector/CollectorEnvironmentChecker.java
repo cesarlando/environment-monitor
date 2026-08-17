@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -77,13 +76,8 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
         );
 
         logger.info(
-                "Tentando autenticação no coletor {} | URL: {} | applicationId: {} | connectionType: {} | tenant: '{}' | userLogOnName: {}",
-                environment.getName(),
-                loginUrl,
-                payload.get("applicationId"),
-                payload.get("connectionType"),
-                payload.get("tenant"),
-                payload.get("userLogOnName")
+                "Executando autenticação do coletor {}",
+                environment.getName()
         );
 
         String jsonPayload;
@@ -98,11 +92,13 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
             );
         }
 
+        HttpURLConnection connection = null;
+
         try {
 
             URL url = new URL(loginUrl);
 
-            HttpURLConnection connection =
+            connection =
                     (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("POST");
@@ -133,18 +129,6 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
                     responseCode
             );
 
-            InputStream responseStream =
-                    responseCode >= 400
-                            ? connection.getErrorStream()
-                            : connection.getInputStream();
-
-            String responseBody = "";
-
-            if (responseStream != null) {
-                responseBody =
-                        new String(responseStream.readAllBytes());
-            }
-
             long responseTime =
                     System.currentTimeMillis() - startTime;
 
@@ -160,12 +144,8 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
                         "Login do coletor realizado com sucesso - HTTP 200"
                 );
 
-                connection.disconnect();
-
                 return checkResult;
             }
-
-            connection.disconnect();
 
             throw new IllegalStateException(
                     "Falha na autenticação do coletor "
@@ -181,6 +161,12 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
                             + environment.getName(),
                     exception
             );
+
+        } finally {
+
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 

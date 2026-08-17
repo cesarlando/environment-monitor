@@ -29,6 +29,8 @@ public class LocalEnvironmentProperties {
         private String username;
         private String password;
         private String tenant;
+        private String authenticationType;
+        private String authenticationPath;
 
 
         public EnvironmentConfig() {
@@ -80,6 +82,22 @@ public class LocalEnvironmentProperties {
 
         public void setTenant(String tenant) {
             this.tenant = tenant;
+        }
+
+        public String getAuthenticationType() {
+            return authenticationType;
+        }
+
+        public void setAuthenticationType(String authenticationType) {
+            this.authenticationType = authenticationType;
+        }
+
+        public String getAuthenticationPath() {
+            return authenticationPath;
+        }
+
+        public void setAuthenticationPath(String authenticationPath) {
+            this.authenticationPath = authenticationPath;
         }
     }
 }

@@ -6,6 +6,7 @@ import br.com.cesarlando.environmentmonitor.domain.model.CheckResult;
 import br.com.cesarlando.environmentmonitor.domain.model.Environment;
 import br.com.cesarlando.environmentmonitor.domain.ports.EnvironmentChecker;
 import br.com.cesarlando.environmentmonitor.infrastructure.authentication.highjump.HighJumpAuthenticationClient;
+import br.com.cesarlando.environmentmonitor.infrastructure.authentication.highjump.HighJumpSessionClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,10 +18,12 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
     private static final Logger logger = LoggerFactory.getLogger(CollectorEnvironmentChecker.class);
     private final LocalEnvironmentProperties localEnvironmentProperties;
     private final HighJumpAuthenticationClient highJumpAuthenticationClient;
+    private final HighJumpSessionClient highJumpSessionClient;
 
-    public CollectorEnvironmentChecker(LocalEnvironmentProperties localEnvironmentProperties, HighJumpAuthenticationClient highJumpAuthenticationClient) {
+    public CollectorEnvironmentChecker(LocalEnvironmentProperties localEnvironmentProperties, HighJumpAuthenticationClient highJumpAuthenticationClient, HighJumpSessionClient highJumpSessionClient) {
         this.localEnvironmentProperties = localEnvironmentProperties;
         this.highJumpAuthenticationClient = highJumpAuthenticationClient;
+        this.highJumpSessionClient = highJumpSessionClient;
     }
 
     private LocalEnvironmentProperties.EnvironmentConfig
@@ -63,7 +66,7 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
 
         try {
 
-            int responseCode =
+            HighJumpAuthenticationClient.HighJumpAuthenticationResult authResult =
                     highJumpAuthenticationClient.authenticate(
                             loginUrl,
                             jsonPayload
@@ -72,13 +75,51 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
             logger.info(
                     "Resposta autenticação coletor {} | HTTP {}",
                     environment.getName(),
-                    responseCode
+                    authResult.responseCode()
             );
 
             long responseTime =
                     System.currentTimeMillis() - startTime;
 
-            if (responseCode == 200) {
+            if (authResult.responseCode() == 200) {
+                String authenticationTicket =
+                        highJumpAuthenticationClient
+                                .extractSerializedAuthenticationTicket(
+                                        authResult.responseBody()
+                                );
+
+                if (authenticationTicket == null || authenticationTicket.isBlank()) {
+                    throw new IllegalStateException(
+                            "AuthenticationTicket não retornado para o coletor: "
+                                    + environment.getName()
+                    );
+                }
+
+                String registerUrl =
+                        highJumpSessionClient.buildRegisterChildSessionUrl(
+                                config.getEndpoint()
+                        );
+
+                HighJumpSessionClient.HighJumpSessionResult sessionResult =
+                        highJumpSessionClient.registerChildSession(
+                                registerUrl,
+                                authenticationTicket
+                        );
+
+                logger.info(
+                        "Registro de sessão SCA inMotion do coletor {} | HTTP {}",
+                        environment.getName(),
+                        sessionResult.responseCode()
+                );
+
+                if (sessionResult.responseCode() != 200) {
+                    throw new IllegalStateException(
+                            "Falha ao registrar sessão SCA inMotion do coletor "
+                                    + environment.getName()
+                                    + " - HTTP "
+                                    + sessionResult.responseCode()
+                    );
+                }
 
                 CheckResult checkResult = new CheckResult();
 
@@ -97,7 +138,7 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
                     "Falha na autenticação do coletor "
                             + environment.getName()
                             + " - HTTP "
-                            + responseCode
+                            + authResult.responseCode()
             );
 
         } catch (Exception exception) {

@@ -4,10 +4,12 @@ import br.com.cesarlando.environmentmonitor.config.properties.LocalEnvironmentPr
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component
@@ -69,7 +71,7 @@ public class HighJumpAuthenticationClient {
         }
     }
 
-    public int authenticate(
+    public HighJumpAuthenticationResult authenticate(
             String loginUrl,
             String jsonPayload) {
 
@@ -102,7 +104,27 @@ public class HighJumpAuthenticationClient {
                 writer.flush();
             }
 
-            return connection.getResponseCode();
+            int responseCode = connection.getResponseCode();
+
+            InputStream responseStream =
+                    responseCode >= 400
+                            ? connection.getErrorStream()
+                            : connection.getInputStream();
+
+            String responseBody = "";
+
+            if (responseStream != null) {
+                responseBody =
+                        new String(
+                                responseStream.readAllBytes(),
+                                StandardCharsets.UTF_8
+                        );
+            }
+
+            return new HighJumpAuthenticationResult(
+                    responseCode,
+                    responseBody
+            );
 
         } catch (Exception exception) {
 
@@ -116,6 +138,34 @@ public class HighJumpAuthenticationClient {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+    }
+    public record HighJumpAuthenticationResult(
+            int responseCode,
+            String responseBody
+    ) {
+    }
+
+    public String extractSerializedAuthenticationTicket(String responseBody) {
+
+        try {
+            var root = objectMapper.readTree(responseBody);
+
+            var ticketNode = root.get("SerializedAuthenticationTicket");
+
+            if (ticketNode == null || ticketNode.isNull()) {
+                throw new IllegalStateException(
+                        "SerializedAuthenticationTicket não encontrado na resposta HighJump"
+                );
+            }
+
+            return ticketNode.asText();
+
+        } catch (Exception exception) {
+            throw new IllegalStateException(
+                    "Erro ao extrair SerializedAuthenticationTicket da resposta HighJump",
+                    exception
+            );
         }
     }
 }

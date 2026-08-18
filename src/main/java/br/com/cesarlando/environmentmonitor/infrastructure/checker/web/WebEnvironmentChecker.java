@@ -80,7 +80,7 @@ public class WebEnvironmentChecker implements EnvironmentChecker {
         String jsonPayload =
                 highJumpAuthenticationClient.buildLoginPayload(config);
 
-        int responseCode =
+        HighJumpAuthenticationClient.HighJumpAuthenticationResult authResult =
                 highJumpAuthenticationClient.authenticate(
                         loginUrl,
                         jsonPayload
@@ -89,7 +89,7 @@ public class WebEnvironmentChecker implements EnvironmentChecker {
         long responseTime =
                 System.currentTimeMillis() - startTime;
 
-        if (responseCode == 200) {
+        if (authResult.responseCode() == 200) {
 
             CheckResult checkResult = new CheckResult();
 
@@ -108,7 +108,7 @@ public class WebEnvironmentChecker implements EnvironmentChecker {
                 "Falha na autenticação WEB HighJump "
                         + environment.getName()
                         + " - HTTP "
-                        + responseCode
+                        + authResult.responseCode()
         );
     }
 

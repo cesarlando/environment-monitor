@@ -244,19 +244,17 @@ public class CollectorEnvironmentChecker implements EnvironmentChecker {
                 String finalResponseBody =
                         finalWebTerminalResult.responseBody();
 
-                logger.info(
-                        "Resumo WebTerminal final {} | bodyLength={} | engineDown={} | terminalInUse={} | sessionEnd={} | isJsonLike={}",
-                        environment.getName(),
-                        finalResponseBody != null ? finalResponseBody.length() : 0,
+                boolean hasFunctionalScreen =
                         finalResponseBody != null
-                                && finalResponseBody.toUpperCase().contains("ADVANTAGEWORKFLOWENGINEISDOWN"),
-                        finalResponseBody != null
-                                && finalResponseBody.toUpperCase().contains("TERMINALISALREADYINUSE"),
-                        finalResponseBody != null
-                                && finalResponseBody.toUpperCase().contains("ADV_SESSION_END"),
-                        finalResponseBody != null
-                                && finalResponseBody.trim().startsWith("{")
-                );
+                                && finalResponseBody.contains("\"screen\"")
+                                && finalResponseBody.contains("\"screenType\"");
+
+                if (!hasFunctionalScreen) {
+                    throw new IllegalStateException(
+                            "Resposta funcional inválida do WebTerminal para o coletor: "
+                                    + environment.getName()
+                    );
+                }
 
                 CheckResult checkResult = new CheckResult();
 
